@@ -21,7 +21,7 @@ function getHours(start_time, end_time) {
 
 /**
  * This runs when a tickbox in the "Notify me" section of the table is changed
- * @param {string} notify_id The id of the tickbox
+ * @param {string} notify_id The id of the tickbox, which is something like "notify-1-2024-03-27"
  */
 function notify(notify_id) {
 	const tickbox = document.getElementById(notify_id);    
@@ -51,15 +51,18 @@ function notify(notify_id) {
 		})
 		.then(data => {
 			let errormessage = data;
-			appendAlert(errormessage, 'success');
+			if (data == "ok") {
+				appendAlert(errormessage, 'success');
+			} else {
+				appendAlert(errormessage, 'danger');
+			}
+			
 			console.log(errormessage);
-			// Handle response from server if needed
 		})
 		.catch(error => {
 			let errormessage = 'There was a problem with the fetch operation:';
 			appendAlert(errormessage + ' ' + error, 'danger');
 			console.error(errormessage, error);
-			// Handle error if needed
 		});
 	}
 }
@@ -87,7 +90,14 @@ function getData (role) {
 		newElement.innerHTML = `
 			<td>${formatDate(currentDate, format.value)}</td>
 			<td id="role${role}-${formatDate(currentDate, 'YYYY-MM-DD')}"></td>
-			<td><input type="checkbox" class="form-check-input" onclick="notify('notify-${role}-${formatDate(currentDate, 'YYYY-MM-DD')}')" id="notify-${role}-${formatDate(currentDate, 'YYYY-MM-DD')}"></td>
+			<td>
+				<input
+					type="checkbox"
+					class="form-check-input"
+					onclick="notify('notify-${role}-${formatDate(currentDate, 'YYYY-MM-DD')}')"
+					id="notify-${formatDate(currentDate, 'YYYY-MM-DD')}"
+				>
+			</td>
 		`;
 		tbody.appendChild(newElement);
 		
@@ -129,7 +139,7 @@ function getData (role) {
 			const data = JSON.parse(this.responseText); // Parse the response to an array
 
 			data.forEach(function(notify) {
-				const tickboxElement = document.getElementById(`notify-${notify.role}-${notify.start_time.split(' ')[0]}`);
+				const tickboxElement = document.getElementById(`notify-${notify.timeslot}`);
 				tickboxElement.setAttribute("checked", true);
 			});
 		}

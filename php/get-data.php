@@ -44,28 +44,6 @@ $stmt->execute([
 ]);
 
 while ($timeslot = $stmt->fetch()) {
-	//get data from notify table
-	$stmt2 = $pdo->prepare('
-		Select
-			user.fullname
-		From
-			notify Left Join
-			timeslot On timeslot.id = notify.timeslot Left Join
-			user On user.id = notify.user
-		Where
-			timeslot.id = :id
-		Order By
-			notify.requested_time
-	');
-
-	$stmt2->execute([
-		'id' => $timeslot['id']
-	]);
-
-	while ($notify = $stmt2->fetch()) {
-		$timeslot['users'][] = $notify;
-	}
-
 	$timeslots[] = $timeslot;
 }
 

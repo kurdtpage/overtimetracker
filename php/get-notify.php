@@ -3,9 +3,7 @@
 $notifys = array();
 
 if (empty($_GET['userid']) || empty($_GET['role'])) {
-	$notifys[] = array(
-		'error' => 'Missing info'
-	);
+	$notifys[] = array('error' => 'Missing info');
 	echo json_encode($notifys);
 	exit();
 }
@@ -13,16 +11,14 @@ if (empty($_GET['userid']) || empty($_GET['role'])) {
 require_once 'inc/connect.php';
 
 $stmt = $pdo->prepare('
-	Select
-		timeslot.id,
-		timeslot.start_time,
-		timeslot.role
-	From
-		notify Left Join
-		timeslot On timeslot.id = notify.timeslot
+	Select timeslot
+	From notify
 	Where
-		timeslot.role = :role And
-		notify.user = :user
+		role = :role And
+		user = :user And
+		timeslot >= CurDate() And
+		timeslot < Date_Add(CurDate(), Interval 30 Day)
+	Order by timeslot
 ');
 
 $stmt->execute([

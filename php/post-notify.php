@@ -4,13 +4,13 @@ session_start();
 
 $output = array();
 
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
+if (!isset($_SESSION['loggedin'])) {
 	header('location: ../logout.php');
 	exit;
 }
 
-if (empty($_POST['id']) || empty($_POST['state'])) {
-	echo 'id or state is empty';
+if (empty($_POST['id']) || empty($_POST['state']) || !stristr($_POST['id'], '-')) {
+	echo 'Missing data';
 	//print_r($_POST);
 	exit;
 }
@@ -18,13 +18,17 @@ if (empty($_POST['id']) || empty($_POST['state'])) {
 require_once 'inc/connect.php';
 
 /*
-╔══════════╗   ╔════════════╗
-║ notify   ║   ║ timeslot   ║
-╟──────────╢   ╟────────────╢
-║ id       ║ ┌►╢ id         ║
-║ timeslot ╟─┘ ║ start_time ║
-║ user     ║   ║ role       ║
-╚══════════╝   ╚════════════╝
+╔╡notify╞═════╤════╤════╤═══════════════════════╗
+║id│timeslot  │user│role│requested_time         ║
+╟──┼──────────┼────┼────┼───────────────────────╢
+║ 1│2024-03-26│   1│   1│2024-03-22 17:16:43.000║
+║ 2│2024-03-27│   1│   2│2024-03-22 17:16:44.000║
+║ 3│2024-03-28│   2│   1│2024-03-22 17:16:45.000║
+║ 4│2024-03-29│   2│   2│2024-03-22 17:16:46.000║
+║ 5│2024-03-30│   1│   1│2024-03-22 17:16:47.000║
+║ 6│2024-03-31│   1│   2│2024-03-22 17:16:48.000║
+║ 7│2024-03-31│   2│   2│2024-03-22 17:16:49.000║
+╚══╧══════════╧════╧════╧═══════════════════════╝
 */
 
 //id is like this: notify-1-2024-03-27 (1 is the role)
@@ -32,25 +36,25 @@ require_once 'inc/connect.php';
 $state = $_POST['state'];
 $bigid = explode('-', $_POST['id']);
 $role = $bigid[1];
-$startdate = $bigid[2] . '-' . $bigid[3] . '-' . $bigid[4];
+$timeslot = $bigid[2] . '-' . $bigid[3] . '-' . $bigid[4];
+//           year              month             day
+$user = $_SESSION['userid'];
 
 //get the timeslot id, this is to see if it exists or not
-$sql = 'Select 
-		notify.id
-	From 
-		notify Left Join 
-		timeslot On timeslot.id = notify.timeslot
+$sql = 'Select id
+	From notify
 	WHERE 
-		notify.user = :user And
-		timeslot.role = :role And
-		timeslot.start_time like :startdate';
+		timeslot = :timeslot And
+		user = :user And
+		role = :role
+';
 $data = [
-	'user' => $_SESSION['userid'],
-	'role' => $role,
-	'startdate' => $startdate . '%'
+	'timeslot' => $timeslot,
+	'user' => $user,
+	'role' => $role
 ];
 $modifiedSql = replaceNamedPlaceholders($sql, $data);
-$output[53] = $modifiedSql;
+$output[57] = $modifiedSql;
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($data);
@@ -61,54 +65,43 @@ if ($notify) {
 	if ($state == 'false') {
 		//untick box, delete record
 		$sql = 'DELETE FROM notify
-			WHERE timeslot = :timeslot AND user = :user';
+			WHERE
+				timeslot = :timeslot And
+				user = :user And
+				role = :role
+		';
 		$data = [
-			'timeslot' => $notify['id'],
-			'user' => $_SESSION['userid']
+			'timeslot' => $timeslot,
+			'user' => $user,
+			'role' => $role
 		];
 		$modifiedSql = replaceNamedPlaceholders($sql, $data);
-		$output[70] = $modifiedSql;
+		$output[79] = $modifiedSql;
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute($data);
 	} else {
-		$output[74] = ' ';
+		$output[83] = ' ';
 	}
 } else {
     //does not exist
 	if ($state == 'true') {
 		//box is unticked, want it ticked. create record
-		//get timeslot record
-		$sql = 'SELECT id
-			FROM timeslot
-			WHERE
-				start_time like :startdate And
-				role = :role';
+		$sql = 'INSERT INTO notify (
+			timeslot, user, role
+		) VALUES (
+			:timeslot, :user, :role
+		)';
 		$data = [
-			'startdate' => $startdate . '%',
+			'timeslot' => $timeslot,
+			'user' => $user,
 			'role' => $role
 		];
 		$modifiedSql = replaceNamedPlaceholders($sql, $data);
-		$output[91] = $modifiedSql;
-		$stmt = $pdo->prepare($sql);
-		$stmt->execute($data);
-		$timeslot = $stmt->fetch();
-
-		//insert into notify
-		$sql = 'INSERT INTO notify (
-			timeslot, user
-		) VALUES (
-			:timeslot, :user
-		)';
-		$data = [
-			'timeslot' => $timeslot['id'],
-			'user' => $_SESSION['userid']
-		];
-		$modifiedSql = replaceNamedPlaceholders($sql, $data);
-		$output[107] = $modifiedSql;
+		$output[100] = $modifiedSql;
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute($data);
 	} else {
-		$output[111] = ' ';
+		$output[104] = ' ';
 	}
 }
 

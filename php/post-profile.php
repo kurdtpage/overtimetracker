@@ -17,12 +17,14 @@ require_once 'inc/connect.php';
 $sql = 'UPDATE user SET
 	fullname = :fullname,
 	email = :email,
-	phone = :phone
+	phone = :phone,
+	format = :format
 WHERE id = :id';
 $data = [
 	'fullname' => $_POST['fullname'],
 	'email' => $_POST['email'],
 	'phone' => $_POST['phone'],
+	'format' => $_POST['format'],
 	'id' => $_POST['id']
 ];
 $modifiedSql = replaceNamedPlaceholders($sql, $data);
@@ -41,4 +43,4 @@ if (!empty($_POST['password'])) {
 	$stmt->execute($data);
 }
 
-echo 'ok';
+echo 'ok ' . $modifiedSql;

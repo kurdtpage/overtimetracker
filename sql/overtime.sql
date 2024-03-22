@@ -50,7 +50,7 @@ CREATE TABLE `user` (
 	`password` varchar(100) NOT NULL,
 	`fullname` varchar(100) NOT NULL,
 	`phone` varchar(100) NOT NULL,
-	`role` INT DEFAULT 1 NOT NULL,
+	`role` int(11) DEFAULT 1 NOT NULL,
 	CONSTRAINT user_pk PRIMARY KEY (id),
 	CONSTRAINT user_email UNIQUE KEY (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -59,8 +59,9 @@ INSERT INTO `user` (id, email, password, fullname, phone, `role`) VALUES(1, 'exa
 -- overtime.notify definition
 CREATE TABLE `notify` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timeslot` int(11) NOT NULL,
+  `timeslot` date DEFAULT (curdate()) NOT NULL,
   `user` int(11) NOT NULL,
+  `role` int(11) NOT NULL,
   `requested_time` timestamp NOT NULL DEFAULT current_timestamp ON UPDATE current_timestamp,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

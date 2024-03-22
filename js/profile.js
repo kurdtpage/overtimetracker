@@ -114,7 +114,7 @@ if (profile_save) {
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				//console.log(this.responseText);
-				if (this.responseText == "ok") {
+				if (this.responseText.substring(0, 2) == "ok") {
 					appendAlert("Your profile has been saved", "success");
 				} else {
 					appendAlert("Your profile has not been saved", "danger");
