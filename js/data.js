@@ -6,8 +6,8 @@
  */
 function getHours(start_time, end_time) {
 	// Parse time strings into Date objects
-	const start = new Date("1970-01-01T" + start_time + "Z");
-	const end = new Date("1970-01-01T" + end_time + "Z");
+	const start = new Date(`1970-01-01T${start_time}Z`);
+	const end = new Date(`1970-01-01T${end_time}Z`);
 
 	// Calculate time difference in milliseconds
 	const timeDiff = end - start;
@@ -43,7 +43,7 @@ function notify(notify_id) {
 		})
 		.then(response => {
 			if (!response.ok) {
-				let errormessage = 'Network response was not ok';
+				let errormessage = `Network response was not ok: ${response}`;
 				appendAlert(errormessage, 'danger');
 				throw new Error(errormessage);
 			}
@@ -60,22 +60,33 @@ function notify(notify_id) {
 			console.log(errormessage);
 		})
 		.catch(error => {
-			let errormessage = 'There was a problem with the fetch operation:';
-			appendAlert(errormessage + ' ' + error, 'danger');
+			let errormessage = 'There was a problem with the fetch operation: ';
+			appendAlert(errormessage + error, 'danger');
 			console.error(errormessage, error);
 		});
 	}
 }
 
 /**
+ * Sets a hidden input with the value of the timeslot id that was just clicked. Used by the modal
+ * @param {string} id The value of the timeslot id to set
+ */
+function confirmModalClick(id) {
+	const newElement = document.getElementById('timeslotid');
+	newElement.setAttribute('value', id);
+}
+
+document.getElementById('confirmBtn').addEventListener('click', function() {
+	//update request table
+});
+
+/**
  * Generates the next 30 days, and puts the data next to the values
  * @param {int} role The role id
  */
 function getData (role) {
-	//const rolenew = role.replace(/\s/g, "").toLowerCase();
-
 	//generate 30 days of rows
-	const tbody = document.getElementById("tbody-role-" + role);
+	const tbody = document.getElementById(`tbody-role-${role}`);
 	tbody.innerHTML = '';
 	
 	const today = new Date();
@@ -83,10 +94,10 @@ function getData (role) {
 	endDate.setDate(today.getDate() + 30);
 
 	const currentDate = new Date(today);
-	const format = document.getElementById("format");
+	const format = document.getElementById('format');
 
 	while (currentDate <= endDate) {
-		const newElement = document.createElement("tr");
+		const newElement = document.createElement('tr');
 		newElement.innerHTML = `
 			<td>${formatDate(currentDate, format.value)}</td>
 			<td id="role${role}-${formatDate(currentDate, 'YYYY-MM-DD')}"></td>
@@ -109,27 +120,29 @@ function getData (role) {
 	xmlhttp2.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			const data = JSON.parse(this.responseText); // Parse the response to an array
+			console.log(data);
 
 			data.forEach(function(timeslot) {
 				const id = timeslot.id;
 				const area_name = timeslot.area_name;
-				const startdate = timeslot.start_time.split(" ")[0]; //yyyy-mm-dd
-				const starttime = timeslot.start_time.split(" ")[1].split(":").slice(0, 2).join(":"); //remove seconds
-				const endtime = timeslot.end_time.split(" ")[1].split(":").slice(0, 2).join(":"); //remove seconds
+				const startdate = timeslot.start_time.split(' ')[0]; //yyyy-mm-dd
+				const starttime = timeslot.start_time.split(' ')[1].split(':').slice(0, 2).join(':'); //remove seconds
+				const endtime = timeslot.end_time.split(" ")[1].split(':').slice(0, 2).join(':'); //remove seconds
 				const parentElement = document.getElementById(`role${role}-${startdate}`);
 
-				const newElement = document.createElement("button");
-				newElement.setAttribute("id", id);
-				newElement.setAttribute("type", "button");
-				newElement.setAttribute("class", "btn btn-primary");
-				newElement.setAttribute("data-bs-toggle", "modal");
-				newElement.setAttribute("data-bs-target", "#confirmModal");
+				const newElement = document.createElement('button');
+				newElement.setAttribute('id', id);
+				newElement.setAttribute('type', 'button');
+				newElement.setAttribute('class', 'btn btn-primary');
+				newElement.setAttribute('data-bs-toggle', 'modal');
+				newElement.setAttribute('data-bs-target', '#confirmModal');
+				newElement.setAttribute('onclick', `confirmModalClick('${id}')`);
 				newElement.innerHTML = `${area_name} ${starttime} - ${endtime} (${getHours(starttime, endtime)} hours)`;
 				parentElement.appendChild(newElement);
 			});
 		}
 	};
-	xmlhttp2.open("GET", "php/get-data.php?userid=" + userid + "&role=" + role, true);
+	xmlhttp2.open('GET', `php/get-data.php?userid=${userid}&role=${role}`, true);
 	xmlhttp2.send();
 
 	//get data from db for "Notify me" tick boxes
@@ -137,26 +150,27 @@ function getData (role) {
 	xmlhttp6.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			const data = JSON.parse(this.responseText); // Parse the response to an array
+			console.log(data);
 
 			data.forEach(function(notify) {
 				const tickboxElement = document.getElementById(`notify-${notify.timeslot}`);
-				tickboxElement.setAttribute("checked", true);
+				tickboxElement.setAttribute('checked', true);
 			});
 		}
 	};
-	xmlhttp6.open("GET", "php/get-notify.php?userid=" + userid + "&role=" + role, true);
+	xmlhttp6.open('GET', `php/get-notify.php?userid=${userid}&role=${role}`, true);
 	xmlhttp6.send();
 }
 
 //three tick box thing
 let checks = 0;
 
-const confirmModal = document.getElementById('confirmModal')
+const confirmModal = document.getElementById('confirmModal');
 confirmModal.addEventListener('show.bs.modal', event => {
 	//unchecks the 3 tick boxes once the modal is shown
-	const check1 = document.getElementById("check1");
-	const check2 = document.getElementById("check2");
-	const check3 = document.getElementById("check3");
+	const check1 = document.getElementById('check1');
+	const check2 = document.getElementById('check2');
+	const check3 = document.getElementById('check3');
 
 	check1.checked = false;
 	check2.checked = false;
@@ -164,18 +178,18 @@ confirmModal.addEventListener('show.bs.modal', event => {
 
 	confirmBtn.disabled = true;
 	checks = 0;
-})
+});
 
-const check1 = document.getElementById("check1");
-const check2 = document.getElementById("check2");
-const check3 = document.getElementById("check3");
+const check1 = document.getElementById('check1');
+const check2 = document.getElementById('check2');
+const check3 = document.getElementById('check3');
 
 check1.addEventListener('change', checkchange);
 check2.addEventListener('change', checkchange);
 check3.addEventListener('change', checkchange);
 
 function checkchange() {
-	const confirmBtn = document.getElementById("confirmBtn");
+	const confirmBtn = document.getElementById('confirmBtn');
 	if (this.checked) {
 		checks++;
 		if (checks === 3) {

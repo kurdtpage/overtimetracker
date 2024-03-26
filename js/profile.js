@@ -10,7 +10,7 @@ function formatDate(date, format) {
 	const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 	const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-	if (typeof date === "string") {
+	if (typeof date === 'string') {
 		date = new Date(date);
 	}
 
@@ -38,15 +38,16 @@ const xmlhttp0 = new XMLHttpRequest();
 xmlhttp0.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
 		const overtime = JSON.parse(this.responseText); // Parse the response to an array
-		const format = document.getElementById("format");
+		console.log(overtime);
+		const format = document.getElementById('format');
 
 		overtime.forEach(function(timeslot) {
-			const tbody_myovertime = document.getElementById("tbody-myovertime");
-			const tr = document.createElement("tr");
-			const startdate = timeslot.start_time.split(" ")[0];
-			const starttime = timeslot.start_time.split(" ")[1].split(":").slice(0, 2).join(":"); //remove seconds
-			const enddate = timeslot.end_time.split(" ")[0];
-			const endtime = timeslot.end_time.split(" ")[1].split(":").slice(0, 2).join(":"); //remove seconds
+			const tbody_myovertime = document.getElementById('tbody-myovertime');
+			const tr = document.createElement('tr');
+			const startdate = timeslot.start_time.split(' ')[0];
+			const starttime = timeslot.start_time.split(' ')[1].split(':').slice(0, 2).join(':'); //remove seconds
+			const enddate = timeslot.end_time.split(' ')[0];
+			const endtime = timeslot.end_time.split(' ')[1].split(':').slice(0, 2).join(':'); //remove seconds
 
 			tr.innerHTML = `
 				<td>${formatDate(startdate, format.value)}<br>${starttime}</td>
@@ -60,7 +61,7 @@ xmlhttp0.onreadystatechange = function() {
 	}
 };
 
-xmlhttp0.open("GET", "php/get-myovertime.php?userid=" + userid, true);
+xmlhttp0.open('GET', `php/get-myovertime.php?userid=${userid}`, true);
 xmlhttp0.send();
 
 function getCookies() {
@@ -76,63 +77,58 @@ function getCookies() {
 
 const cookies = getCookies();
 
-if ('id' in cookies) {
+if ('id' in cookies) { //user is logged in
 	userid = cookies.id;
-	document.getElementById("id").value = cookies.id;
-	document.getElementById("email").value = cookies.email;
-	document.getElementById("username").value = cookies.fullname;
-	document.getElementById("phone").value = cookies.phone;
-	document.getElementById("role").value = cookies.role;
-	document.getElementById("format").value = cookies.format;
+	document.getElementById('id').value = cookies.id;
+	document.getElementById('email').value = cookies.email;
+	document.getElementById('fullname').value = cookies.fullname;
+	document.getElementById('phone').value = cookies.phone;
+	document.getElementById('role').value = cookies.role;
+	document.getElementById('format').value = cookies.format;
 } else {
-	window.location.href = "login.php";
+	window.location.href = 'logout.php';
 }
 
-if (cookies.role != "0") {
+if (cookies.role != '0') {
 	//not an admin, so hide admin tab
-	const admin_tab = document.getElementById("admin-tab");
-	admin_tab.style.display = "none";
+	const admin_tab = document.getElementById('admin-tab');
+	admin_tab.style.display = 'none';
 }
 
-document.getElementById("dateformat1").innerText = `${formatDate(new Date(), "MM/DD/YYYY")}`;
-document.getElementById("dateformat2").innerText = `${formatDate(new Date(), "DD/MM/YYYY")}`;
-document.getElementById("dateformat3").innerText = `${formatDate(new Date(), "YYYY-MM-DD")}`;
-document.getElementById("dateformat4").innerText = `${formatDate(new Date(), "DAY MONTH DD, YYYY")}`;
-document.getElementById("dateformat5").innerText = `${formatDate(new Date(), "DAY DD MONTH, YYYY")}`;
+document.getElementById("dateformat1").innerText = `${formatDate(new Date(), 'MM/DD/YYYY')}`;
+document.getElementById("dateformat2").innerText = `${formatDate(new Date(), 'DD/MM/YYYY')}`;
+document.getElementById("dateformat3").innerText = `${formatDate(new Date(), 'YYYY-MM-DD')}`;
+document.getElementById("dateformat4").innerText = `${formatDate(new Date(), 'DAY MONTH DD, YYYY')}`;
+document.getElementById("dateformat5").innerText = `${formatDate(new Date(), 'DAY DD MONTH, YYYY')}`;
 
-const profile_save = document.getElementById("profile-save");
+const profile_save = document.getElementById('profile-save');
 if (profile_save) {
-	profile_save.addEventListener("click", () => {
-		//check passwords match, this is true if they are both empty as well
-		if (document.getElementById("currentPassword").value != document.getElementById("newPassword").value) {
-			alert("Passwords do not match");
-			return;
-		}
-
+	profile_save.addEventListener('click', () => {
 		//update user details
 		const xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
-				//console.log(this.responseText);
-				if (this.responseText.substring(0, 2) == "ok") {
-					appendAlert("Your profile has been saved", "success");
+				console.log(this.responseText);
+				if (this.responseText.substring(0, 2) == 'ok') {
+					appendAlert('Your profile has been saved', 'success');
 				} else {
-					appendAlert("Your profile has not been saved", "danger");
+					appendAlert('Your profile has not been saved', 'danger');
 				}
 			}
 		};
 
 		const formData = new FormData();
-		formData.append("id", document.getElementById("id").value);
-		formData.append("fullname", document.getElementById("username").value);
-		formData.append("email", document.getElementById("email").value);
-		formData.append("phone", document.getElementById("phone").value);
-		formData.append("format", document.getElementById("format").value);
-		if (document.getElementById("newPassword").value != "") {
-			formData.append("password", document.getElementById("newPassword").value);
+		formData.append('id', document.getElementById('id').value);
+		formData.append('fullname', document.getElementById('fullname').value);
+		formData.append('email', document.getElementById('email').value);
+		formData.append('phone', document.getElementById('phone').value);
+		formData.append('format', document.getElementById('format').value);
+		if (document.getElementById('newPassword').value != '') {
+			formData.append('oldPassword', document.getElementById('oldPassword').value);
+			formData.append('newPassword', document.getElementById('newPassword').value);
 		}
 
-		xmlhttp.open("POST", "php/post-profile.php", true);
+		xmlhttp.open('POST', 'php/post-profile.php', true);
 		xmlhttp.send(formData);
 	});
 }

@@ -3,7 +3,7 @@ const appendAlert = (message, type) => {
 	const wrapper = document.createElement('div');
 	const alertElement = document.createElement('div');
 
-	alertElement.classList.add('alert', `alert-${type}`, 'alert-dismissible');
+	alertElement.classList.add('alert', `alert-${type}`, "alert-dismissible");
 	alertElement.setAttribute('role', 'alert');
 	alertElement.innerHTML = `
 		<div>${message}</div>
@@ -13,7 +13,7 @@ const appendAlert = (message, type) => {
 	alertPlaceholder.appendChild(wrapper);
 
 	// Automatically close the alert after 5 seconds
-	if (type == "success") {
+	if (type == 'success') {
 		setTimeout(() => {
 			alertPlaceholder.removeChild(wrapper);
 		}, 5000);

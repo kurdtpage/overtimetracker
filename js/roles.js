@@ -2,18 +2,38 @@ const xmlhttp1 = new XMLHttpRequest();
 xmlhttp1.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
 		const roles = JSON.parse(this.responseText); // Parse the response to an array
+		console.log(roles);
 		let tabindex = 1;
-		const tbody_roles = document.getElementById("tbody-roles");
+		const tbody_roles = document.getElementById('tbody-roles');
 
 		roles.forEach(function(role) {
-			const rolenew = role.role_name.replace(/\s/g, "").toLowerCase(); //remove whitespace
+			const rolenew = role.role_name.replace(/\s/g, '').toLowerCase(); //remove whitespace
 
-			if (cookies.role != "0") {
-				//first do tabs at the top
-				let rolesid = document.getElementById("roles");
-				let newElement = document.createElement("li");
-				newElement.setAttribute("class", "nav-item");
-				newElement.setAttribute("role", "presentation");
+			if (cookies.role === '0') { //admin
+				//do admin form
+				const roleid = document.getElementById('role');
+				newElement = document.createElement('option');
+				newElement.setAttribute('value', tabindex);
+				newElement.innerText = role.role_name;
+				roleid.appendChild(newElement);
+
+				newElement = document.createElement('tr');
+				newElement.setAttribute('id', `role-${role.id}`);
+				newElement.innerHTML = `
+					<td><input type="text" readonly="" class="form-control-plaintext" value="${role.id}"></td>
+					<td><input type="text" class="form-control" value="${role.role_name}"></td>
+					<td>
+						<button type="submit" class="btn btn-primary">Update</button>
+						<button type="submit" class="btn btn-danger">Delete</button>
+					</td>
+				`;
+				tbody_roles.appendChild(newElement);
+			} else { //normal user
+				//do tabs at the top
+				let rolesid = document.getElementById('roles');
+				let newElement = document.createElement('li');
+				newElement.setAttribute('class', 'nav-item');
+				newElement.setAttribute('role', 'presentation');
 				newElement.innerHTML = `
 					<button
 						id="role-${rolenew}-tab" 
@@ -31,14 +51,14 @@ xmlhttp1.onreadystatechange = function() {
 				rolesid.appendChild(newElement);
 				
 				//next do the data in the tabs
-				const tab_content = document.getElementById("tab-content");
-				newElement = document.createElement("div");
+				const tab_content = document.getElementById('tab-content');
+				newElement = document.createElement('div');
 
-				newElement.setAttribute("id", `${rolenew}-tab-pane`);
-				newElement.setAttribute("aria-labelledby", `${rolenew}-tab`);
-				newElement.setAttribute("class", "tab-pane fade");
-				newElement.setAttribute("role", "tabpanel");
-				newElement.setAttribute("tabindex", tabindex);
+				newElement.setAttribute('id', `${rolenew}-tab-pane`);
+				newElement.setAttribute('aria-labelledby', `${rolenew}-tab`);
+				newElement.setAttribute('class', 'tab-pane fade');
+				newElement.setAttribute('role', 'tabpanel');
+				newElement.setAttribute('tabindex', tabindex);
 
 				newElement.innerHTML = `
 					<table class="table table-striped">
@@ -53,31 +73,12 @@ xmlhttp1.onreadystatechange = function() {
 					</table>
 				`;
 				tab_content.appendChild(newElement);
-			} else {
-				//next do admin form
-				const roleid = document.getElementById("role");
-				newElement = document.createElement("option");
-				newElement.setAttribute("value", tabindex);
-				newElement.innerText = role.role_name;
-				roleid.appendChild(newElement);
-
-				newElement = document.createElement("tr");
-				newElement.setAttribute('id', "role-" + role.id);
-				newElement.innerHTML = `
-					<td><input type="text" readonly="" class="form-control-plaintext" value="${role.id}"></td>
-					<td><input type="text" class="form-control" value="${role.role_name}"></td>
-					<td>
-						<button type="submit" class="btn btn-primary">Update</button>
-						<button type="submit" class="btn btn-danger">Delete</button>
-					</td>
-				`;
-				tbody_roles.appendChild(newElement);
 			}
 			tabindex++;
 		});
 
-		newElement = document.createElement("tr");
-		newElement.setAttribute('id', "role-new");
+		newElement = document.createElement('tr');
+		newElement.setAttribute('id', 'role-new');
 		newElement.innerHTML = `
 			<td><input type="text" readonly="" class="form-control-plaintext" value="${tabindex}"></td>
 			<td><input type="text" class="form-control"></td>
@@ -89,7 +90,7 @@ xmlhttp1.onreadystatechange = function() {
 	}
 };
 
-xmlhttp1.open("GET", "php/get-roles.php", true);
+xmlhttp1.open('GET', 'php/get-roles.php', true);
 xmlhttp1.send();
 
 $(function() {

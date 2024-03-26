@@ -6,27 +6,27 @@ require_once 'inc/connect.php';
 
 $stmt = $pdo->query('
 	Select
-		timeslot.id,
-		role.role_name,
+		request.id,
 		area.area_name,
+		role.role_name,
 		timeslot.start_time,
 		timeslot.end_time,
-		user.fullname
+		requester.fullname As requester,
+		approved.fullname As approved,
+		timeslot.taken
 	From
-		timeslot Left Join
-		area On area.id = timeslot.area Left Join
-		role On role.id = timeslot.role Right Join
-		notify On notify.timeslot = timeslot.id Left Join
-		user On user.id = notify.user
+		request Left Join
+		timeslot On timeslot.id = request.timeslot Left Join
+		user requester On requester.id = request.user Left Join
+		user approved On approved.id = request.approved_by Left Join
+		role On role.id = timeslot.role Left Join
+		area On area.id = timeslot.area
 	Where
-		timeslot.taken = 0 And
 		timeslot.start_time >= CurDate() And
-		timeslot.start_time < Date_Add(CurDate(), Interval 30 Day)
-	Order by
-		timeslot.start_time,
-		notify.requested_time,
-		role.id,
-		area.id
+		timeslot.start_time < Date_Add(CurDate(), Interval 30 Day) And
+		timeslot.taken = 0
+	Order By
+		timeslot.start_time
 ');
 
 while ($timeslot = $stmt->fetch()) {
