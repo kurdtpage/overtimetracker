@@ -76,12 +76,13 @@ xmlhttp1.onreadystatechange = function() {
 			}
 			tabindex++;
 		});
+		document.getElementById('role').value = '';
 
 		newElement = document.createElement('tr');
 		newElement.setAttribute('id', 'role-new');
 		newElement.innerHTML = `
 			<td><input type="text" readonly="" class="form-control-plaintext" value="${tabindex}"></td>
-			<td><input type="text" class="form-control"></td>
+			<td><input type="text" class="form-control" placeholder="New role"></td>
 			<td>
 				<button type="submit" class="btn btn-success">Add</button>
 			</td>

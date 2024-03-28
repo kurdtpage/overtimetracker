@@ -83,7 +83,7 @@ if ('id' in cookies) { //user is logged in
 	document.getElementById('email').value = cookies.email;
 	document.getElementById('fullname').value = cookies.fullname;
 	document.getElementById('phone').value = cookies.phone;
-	document.getElementById('role').value = cookies.role;
+	//document.getElementById('role').value = cookies.role;
 	document.getElementById('format').value = cookies.format;
 } else {
 	window.location.href = 'logout.php';

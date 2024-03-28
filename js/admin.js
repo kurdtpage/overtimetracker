@@ -39,6 +39,8 @@ xmlhttp3.onreadystatechange = function() {
 xmlhttp3.open('GET', 'php/get-approved.php', true);
 xmlhttp3.send();
 
+document.getElementById('area').value = '';
+
 //update "Pending overtime Requests" table
 const xmlhttp4 = new XMLHttpRequest();
 xmlhttp4.onreadystatechange = function() {
@@ -95,15 +97,10 @@ xmlhttp5.onreadystatechange = function() {
 		//get roles
 		const tbody = document.getElementById('tbody-roles');
 
-		// Get the select element or create one if it doesn't exist
-		let select = document.getElementById('role-select');
-		if (!select) {
-			select = document.createElement('select');
-			select.id = 'role-select';
-		}
-
-		// Clear any existing options
-		select.innerHTML = '';
+		// Create the select element
+		const select = document.createElement('select');
+		select.id = 'role-select';
+		select.className = 'form-select';
 
 		// Iterate over table rows and create options, excluding the last row
 		tbody.querySelectorAll('tr:not(:last-child)').forEach(row => {
@@ -116,10 +113,7 @@ xmlhttp5.onreadystatechange = function() {
 
 			select.appendChild(option);
 		});
-
-		// Replace the table with the select element
-		tbody.parentNode.replaceChild(select, tbody);
-
+		console.log(select);
 
 		//get users
 		users.forEach(function(user) {
@@ -128,7 +122,8 @@ xmlhttp5.onreadystatechange = function() {
 			newElement.innerHTML = `
 				<td><input type="text" readonly="" class="form-control-plaintext" value="${user.id}"></td>
 				<td><input type="text" readonly="" class="form-control-plaintext" value="${user.fullname}"></td>
-				<td><select class="form-select role" id="user-role" name="role"></select></td>
+				<td><input type="email" readonly="" class="form-control-plaintext" value="${user.email}"></td>
+				<td class="user-role"></td>
 				<td>
 					<button type="submit" class="btn btn-primary">Update</button>
 					<button type="submit" class="btn btn-danger">Delete</button>
@@ -139,18 +134,42 @@ xmlhttp5.onreadystatechange = function() {
 			lastid = user.id + 1;
 		});
 
+		//add new user
 		let newElement = document.createElement('tr');
 		newElement.setAttribute('id', 'user-new');
 		newElement.innerHTML = `
 			<td><input type="text" readonly="" class="form-control-plaintext" value="${lastid}"></td>
-			<td><input type="text" class="form-control">name</td>
-			<td><input type="text" class="form-control">role</td>
+			<td><input type="text" class="form-control" placeholder="New name"></td>
+			<td><input type="text" class="form-control" placeholder="New email"></td>
+			<td class="user-role"></td>
 			<td>
 				<button type="submit" class="btn btn-success">Add</button>
 			</td>
 		`;
-
 		tbody_users.appendChild(newElement);
+
+		// Replace the td with the select element
+		const user_role = document.getElementsByClassName('user-role');
+		// Iterate over each user role td element
+		Array.from(user_role).forEach((td, index) => {
+			// Clone the select element to avoid moving the same select element
+			const clonedSelect = select.cloneNode(true);
+			// Append the cloned select element to the td
+			td.appendChild(clonedSelect);
+			// Set a unique ID for each select element
+			clonedSelect.id = `role-select-${index+1}`;
+		});
+
+		//update user role values
+		users.forEach(function(user) {
+			console.log(user);
+			const role_select = document.getElementById(`role-select-${user.id}`);
+			role_select.value = user.role;
+		});
+
+		//make the new user role empty
+		const new_user_role = document.getElementById(`role-select-${lastid}`);
+		new_user_role.value = '';
 	}
 };
 xmlhttp5.open('GET', 'php/get-users.php', true);
@@ -185,7 +204,7 @@ xmlhttp6.onreadystatechange = function() {
 		newElement.setAttribute('id', 'area-new');
 		newElement.innerHTML = `
 			<td><input type="text" readonly="" class="form-control-plaintext" value="${lastid}"></td>
-			<td><input type="text" class="form-control"></td>
+			<td><input type="text" class="form-control" placeholder="New area"></td>
 			<td>
 				<button type="submit" class="btn btn-success">Add</button>
 			</td>

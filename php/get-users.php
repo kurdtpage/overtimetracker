@@ -8,6 +8,7 @@ $stmt = $pdo->query('
 	Select
 		user.id,
 		user.fullname,
+		user.email,
 		user.role,
 		role.role_name
 	From
