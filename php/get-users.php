@@ -10,14 +10,15 @@ $stmt = $pdo->query('
 		user.fullname,
 		user.email,
 		user.role,
+		user.active,
 		role.role_name
 	From
 		user Left Join
 		role On role.id = user.role
 	Order By
 		user.active desc,
-		user.id,
-		user.fullname
+		user.fullname,
+		user.id
 ');
 
 while ($name = $stmt->fetch()) {

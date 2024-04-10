@@ -16,15 +16,13 @@ $stmt = $pdo->query('
 		timeslot Left Join
 		area On area.id = timeslot.area Left Join
 		role On role.id = timeslot.role Right Join
-		notify On notify.timeslot = timeslot.id Left Join
-		user On user.id = notify.user
+		user On user.id = timeslot.taken
 	Where
 		timeslot.taken <> 0 And
 		timeslot.start_time >= CurDate() And
 		timeslot.start_time < Date_Add(CurDate(), Interval 30 Day)
 	Order by
 		timeslot.start_time,
-		notify.requested_time,
 		role.id,
 		area.id
 ');

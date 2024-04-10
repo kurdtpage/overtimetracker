@@ -1,0 +1,11 @@
+.alert {
+	margin: 16px;
+}
+
+.line-through {
+	text-decoration: line-through;
+}
+
+h2 {
+	margin: 8px;
+}

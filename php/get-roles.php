@@ -8,7 +8,6 @@ $stmt = $pdo->query('
 	Select id, role_name
 	From role
 	where
-		id > 0 And
 		active = 1
 	Order by id
 ');

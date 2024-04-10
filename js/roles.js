@@ -3,7 +3,7 @@ xmlhttp1.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
 		const roles = JSON.parse(this.responseText); // Parse the response to an array
 		console.log(roles);
-		let tabindex = 1;
+		let roleindex = 0;
 		const tbody_roles = document.getElementById('tbody-roles');
 
 		roles.forEach(function(role) {
@@ -13,20 +13,28 @@ xmlhttp1.onreadystatechange = function() {
 				//do admin form
 				const roleid = document.getElementById('role');
 				newElement = document.createElement('option');
-				newElement.setAttribute('value', tabindex);
+				newElement.setAttribute('value', roleindex);
 				newElement.innerText = role.role_name;
-				roleid.appendChild(newElement);
+				if (roleindex > 0) roleid.appendChild(newElement);
 
 				newElement = document.createElement('tr');
 				newElement.setAttribute('id', `role-${role.id}`);
-				newElement.innerHTML = `
-					<td><input type="text" readonly="" class="form-control-plaintext" value="${role.id}"></td>
-					<td><input type="text" class="form-control" value="${role.role_name}"></td>
-					<td>
-						<button type="submit" class="btn btn-primary">Update</button>
-						<button type="submit" class="btn btn-danger">Delete</button>
-					</td>
-				`;
+				if (role.id == 0) { //admin
+					newElement.innerHTML = `
+						<td><input type="text" readonly="" class="form-control-plaintext" value="${role.id}"></td>
+						<td><input type="text" readonly="" class="form-control form-control-plaintext" value="${role.role_name}"></td>
+						<td></td>
+					`;
+				} else { //normal user
+					newElement.innerHTML = `
+						<td><input type="text" readonly="" class="form-control-plaintext" value="${role.id}"></td>
+						<td><input type="text" class="form-control" value="${role.role_name}"></td>
+						<td>
+							<button type="submit" class="btn btn-primary update-role">Update</button>
+							<button type="submit" class="btn btn-danger delete-role">Delete</button>
+						</td>
+					`;
+				}
 				tbody_roles.appendChild(newElement);
 			} else { //normal user
 				//do tabs at the top
@@ -58,7 +66,7 @@ xmlhttp1.onreadystatechange = function() {
 				newElement.setAttribute('aria-labelledby', `${rolenew}-tab`);
 				newElement.setAttribute('class', 'tab-pane fade');
 				newElement.setAttribute('role', 'tabpanel');
-				newElement.setAttribute('tabindex', tabindex);
+				newElement.setAttribute('roleindex', roleindex);
 
 				newElement.innerHTML = `
 					<table class="table table-striped">
@@ -74,14 +82,14 @@ xmlhttp1.onreadystatechange = function() {
 				`;
 				tab_content.appendChild(newElement);
 			}
-			tabindex++;
+			roleindex++;
 		});
 		document.getElementById('role').value = '';
 
 		newElement = document.createElement('tr');
-		newElement.setAttribute('id', 'role-new');
+		newElement.setAttribute('id', 'user-new-role');
 		newElement.innerHTML = `
-			<td><input type="text" readonly="" class="form-control-plaintext" value="${tabindex}"></td>
+			<td><input type="text" readonly="" class="form-control-plaintext" value="${roleindex}"></td>
 			<td><input type="text" class="form-control" placeholder="New role"></td>
 			<td>
 				<button type="submit" class="btn btn-success">Add</button>
@@ -93,8 +101,3 @@ xmlhttp1.onreadystatechange = function() {
 
 xmlhttp1.open('GET', 'php/get-roles.php', true);
 xmlhttp1.send();
-
-$(function() {
-	$('#starttime').datetimepicker();
-	$('#endtime').datetimepicker();
-});

@@ -11,14 +11,12 @@ $stmt = $pdo->query('
 		role.role_name,
 		timeslot.start_time,
 		timeslot.end_time,
-		requester.fullname As requester,
-		approved.fullname As approved,
+		user.fullname,
 		timeslot.taken
 	From
 		request Left Join
 		timeslot On timeslot.id = request.timeslot Left Join
-		user requester On requester.id = request.user Left Join
-		user approved On approved.id = request.approved_by Left Join
+		user On user.id = request.user Left Join
 		role On role.id = timeslot.role Left Join
 		area On area.id = timeslot.area
 	Where

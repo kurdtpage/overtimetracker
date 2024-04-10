@@ -3,7 +3,7 @@ let userid = 1;
 /**
  * Formats a date in various different ways
  * @param {datetime} date Object that holds the date
- * @param {string} format The format to apply. Default is DAY DD MONTH, YYYY
+ * @param {string} format The format to apply. Default is "DD d M, yy"
  * @returns Formatted string representation of the date
  */
 function formatDate(date, format) {
@@ -19,19 +19,25 @@ function formatDate(date, format) {
 	const day = date.getDate();
 	const year = date.getFullYear();
 
-	if (format === 'MM/DD/YYYY') {
+	if (format === 'm/d/yy') {
 		return `${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`;
-	} else if (format === 'DD/MM/YYYY') {
+	} else if (format === 'd/m/yy') {
 		return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
-	} else if (format === 'YYYY-MM-DD') {
+	} else if (format === 'yy-mm-dd') {
 		return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-	} else if (format === 'DAY MONTH DD, YYYY') {
-		return `${dayOfWeek} ${months[date.getMonth()]} ${String(day).padStart(2, '0')}, ${year}`;
+	} else if (format === 'DD M d, yy') {
+		return `${dayOfWeek} ${months[date.getMonth()]} ${String(day)}, ${year}`;
 	} else {
-		// Default format (DAY DD MONTH, YYYY)
-		return `${dayOfWeek} ${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+		// Default format (DD d M, yy)
+		return `${dayOfWeek} ${String(day)} ${months[date.getMonth()]}, ${year}`;
 	}
 }
+
+document.getElementById('dateformat1').innerText = `${formatDate(new Date(), 'm/d/yy')}`;
+document.getElementById('dateformat2').innerText = `${formatDate(new Date(), 'd/m/yy')}`;
+document.getElementById('dateformat3').innerText = `${formatDate(new Date(), 'yy-mm-dd')}`;
+document.getElementById('dateformat4').innerText = `${formatDate(new Date(), 'DD M d, yy')}`;
+document.getElementById('dateformat5').innerText = `${formatDate(new Date(), 'DD d M, yy')}`;
 
 //update "My approved overtime"
 const xmlhttp0 = new XMLHttpRequest();
@@ -95,12 +101,6 @@ if (cookies.role != '0') {
 	admin_tab.style.display = 'none';
 }
 
-document.getElementById("dateformat1").innerText = `${formatDate(new Date(), 'MM/DD/YYYY')}`;
-document.getElementById("dateformat2").innerText = `${formatDate(new Date(), 'DD/MM/YYYY')}`;
-document.getElementById("dateformat3").innerText = `${formatDate(new Date(), 'YYYY-MM-DD')}`;
-document.getElementById("dateformat4").innerText = `${formatDate(new Date(), 'DAY MONTH DD, YYYY')}`;
-document.getElementById("dateformat5").innerText = `${formatDate(new Date(), 'DAY DD MONTH, YYYY')}`;
-
 const profile_save = document.getElementById('profile-save');
 if (profile_save) {
 	profile_save.addEventListener('click', () => {
@@ -109,7 +109,7 @@ if (profile_save) {
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				console.log(this.responseText);
-				if (this.responseText.substring(0, 2) == 'ok') {
+				if (JSON.parse(this.responseText).ok) {
 					appendAlert('Your profile has been saved', 'success');
 				} else {
 					appendAlert('Your profile has not been saved', 'danger');

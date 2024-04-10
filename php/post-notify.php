@@ -2,16 +2,10 @@
 
 session_start();
 
-$output = array();
-
-if (!isset($_SESSION['loggedin'])) {
-	header('location: ../logout.php');
-	exit;
-}
+$output = array(); //TODO: change this to JSON
 
 if (empty($_POST['id']) || empty($_POST['state']) || !stristr($_POST['id'], '-')) {
 	echo 'Missing data';
-	//print_r($_POST);
 	exit;
 }
 
@@ -54,7 +48,7 @@ $data = [
 	'role' => $role
 ];
 $modifiedSql = replaceNamedPlaceholders($sql, $data);
-$output[57] = $modifiedSql;
+$output[51] = $modifiedSql;
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($data);
@@ -76,11 +70,11 @@ if ($notify) {
 			'role' => $role
 		];
 		$modifiedSql = replaceNamedPlaceholders($sql, $data);
-		$output[79] = $modifiedSql;
+		$output[73] = $modifiedSql;
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute($data);
 	} else {
-		$output[83] = ' ';
+		$output[77] = ' ';
 	}
 } else {
     //does not exist
@@ -97,11 +91,11 @@ if ($notify) {
 			'role' => $role
 		];
 		$modifiedSql = replaceNamedPlaceholders($sql, $data);
-		$output[100] = $modifiedSql;
+		$output[94] = $modifiedSql;
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute($data);
 	} else {
-		$output[104] = ' ';
+		$output[98] = ' ';
 	}
 }
 

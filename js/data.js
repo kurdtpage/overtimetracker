@@ -76,8 +76,42 @@ function confirmModalClick(id) {
 	newElement.setAttribute('value', id);
 }
 
+//someone added in a new overtime request
 document.getElementById('confirmBtn').addEventListener('click', function() {
 	//update request table
+	console.log('TODO');
+});
+
+//Add new overtime record
+document.getElementById('add-overtime').addEventListener('click', function() {
+	/*
+		role
+		area
+		starttime
+		endtime
+	*/
+	
+	//add new timeslot
+	const xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			if (JSON.parse(this.responseText).ok) {
+				appendAlert('Overtime record added', 'success');
+			} else {
+				appendAlert(`Overtime record has not been added ${JSON.parse(this.responseText).error}`, 'danger');
+				console.error(this.responseText);
+			}
+		}
+	};
+
+	const formData = new FormData();
+	formData.append('role', document.getElementById('role').value);
+	formData.append('area', document.getElementById('area').value);
+	formData.append('starttime', document.getElementById('starttime').value);
+	formData.append('endtime', document.getElementById('endtime').value);
+	
+	xmlhttp.open('POST', 'php/post-timeslot.php', true);
+	xmlhttp.send(formData);
 });
 
 /**

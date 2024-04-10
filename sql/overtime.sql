@@ -29,27 +29,28 @@ CREATE TABLE `role` (
   `role_name`   varchar(100) NOT NULL,
   `active`      int(1)       NOT NULL DEFAULT 1,
   CONSTRAINT role_pk PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-INSERT INTO `role` (id, role_name, active) VALUES(0, 'Admin',      1);
-INSERT INTO `role` (id, role_name, active) VALUES(1, 'Dispatcher', 1);
-INSERT INTO `role` (id, role_name, active) VALUES(2, 'Call taker', 1);
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `role` (id, role_name) VALUES(0, 'Admin');
+INSERT INTO `role` (id, role_name) VALUES(1, 'Dispatcher'); -- if this causes problems, make sure admin id is 0 and not 1
+INSERT INTO `role` (id, role_name) VALUES(2, 'Call taker');
 
 -- overtime.user definition
 CREATE TABLE `user` (
   `id`          int unsigned NOT NULL AUTO_INCREMENT,
-  `role`        int unsigned NOT NULL,
-  `email`       varchar(256) NOT NULL,
-  `password`    varchar(100) NOT NULL,
-  `fullname`    varchar(100) NOT NULL,
+  `role`        int unsigned NOT NULL DEFAULT 1,
+  `email`       varchar(255) NOT NULL,
+  `password`    varchar(255) NOT NULL,
+  `fullname`    varchar(255) NOT NULL,
+  `format`      varchar(100) NOT NULL DEFAULT 'DD d M, yy',
   `phone`       varchar(30)      NULL,
   `active`      int(1)       NOT NULL DEFAULT 1,
   CONSTRAINT user_pk PRIMARY KEY (`id`),
   CONSTRAINT user_email UNIQUE KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-INSERT INTO `user` (`id`, `role`, `email`, `password`, `fullname`, `phone`, `active`) 
-VALUES(0, 0, 'admin@email.com', '$2y$10$sJanIApwYBM.4boPVUycEeVhSARmWGevZYUrpvD8dIimAioEANI86', 'Admin Istrator', '02123456789', 1); -- password abc123
-INSERT INTO `user` (`id`, `email`, `password`, `fullname`, `phone`, `role`) 
-VALUES(1, 1, 'example@email.com', '$2y$10$sJanIApwYBM.4boPVUycEeVhSARmWGevZYUrpvD8dIimAioEANI86', 'Dummy User', '02123456789', 1); -- password abc123
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `user` (`id`, `role`, `email`, `password`, `fullname`) 
+VALUES(0, 0, 'admin@email.com', '$2y$10$sJanIApwYBM.4boPVUycEeVhSARmWGevZYUrpvD8dIimAioEANI86', 'Admin Istrator'); -- password abc123
+INSERT INTO `user` (`id`, `role`, `email`, `password`, `fullname`) 
+VALUES(1, 1, 'example@email.com', '$2y$10$sJanIApwYBM.4boPVUycEeVhSARmWGevZYUrpvD8dIimAioEANI86', 'Dummy User'); -- password abc123
 
 -- overtime.notify definition
 CREATE TABLE `notify` (
