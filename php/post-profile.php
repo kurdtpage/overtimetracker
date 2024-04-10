@@ -1,7 +1,5 @@
 <?php
 
-session_start();
-
 /**
  * Generates a passphrase consisting of some random words, followed by a number
  * @param {int} $words The number of words the passphrase will have, default is 4
@@ -29,7 +27,7 @@ function generatePassphrase($words = 4, $separator = ' ')
 $response = [];
 $response['ok'] = false;
 $response['post'] = $_POST;
-$response['session'] = $_SESSION;
+$response['cookie'] = $_COOKIE;
 $response['error'] = '';
 
 if (empty($_POST['id'])) {
@@ -61,7 +59,7 @@ if ($_POST['id'] == 'insert') {
 
 	//TODO: email password to user
 	$response['password_emailed'] = false;
-} elseif (!empty($_POST['role'])) {
+} elseif (isset($_POST['role'])) { //dont use 'empty' because admin is role 0, and 0 is "empty"
 	//admin updating user
 	$sql = 'UPDATE user SET
 		role = :role

@@ -28,6 +28,20 @@ function notify(notify_id) {
 	const id = tickbox.getAttribute('id');
 
 	if (id.substring(0, 6) == 'notify') {
+		
+		// Send a POST request to post-notify.php
+		const xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				if (JSON.parse(this.responseText).ok) {
+					appendAlert('Notification requested', 'success');
+				} else {
+					appendAlert(`There was a problem with your notification request. ${JSON.parse(this.responseText).error}`, 'danger');
+					console.error(this.responseText);
+				}
+			}
+		};
+
 		const state = tickbox.checked;
 		const formData = new FormData();
 
@@ -36,7 +50,9 @@ function notify(notify_id) {
 		console.log('id', id);
 		formData.append('state', state);
 
-		// Send a POST request to post-notify.php
+		xmlhttp.open('POST', 'php/post-notify.php', true);
+		xmlhttp.send(formData);
+		/*
 		fetch('php/post-notify.php', {
 			method: 'POST',
 			body: formData
@@ -64,6 +80,7 @@ function notify(notify_id) {
 			appendAlert(errormessage + error, 'danger');
 			console.error(errormessage, error);
 		});
+		*/
 	}
 }
 
@@ -98,7 +115,7 @@ document.getElementById('add-overtime').addEventListener('click', function() {
 			if (JSON.parse(this.responseText).ok) {
 				appendAlert('Overtime record added', 'success');
 			} else {
-				appendAlert(`Overtime record has not been added ${JSON.parse(this.responseText).error}`, 'danger');
+				appendAlert(`Overtime record has not been added. ${JSON.parse(this.responseText).error}`, 'danger');
 				console.error(this.responseText);
 			}
 		}
@@ -157,6 +174,7 @@ function getData (role) {
 			console.log(data);
 
 			data.forEach(function(timeslot) {
+				console.log('timeslot:', timeslot);
 				const id = timeslot.id;
 				const area_name = timeslot.area_name;
 				const startdate = timeslot.start_time.split(' ')[0]; //yyyy-mm-dd
@@ -187,6 +205,7 @@ function getData (role) {
 			console.log(data);
 
 			data.forEach(function(notify) {
+				console.log('notify:', notify);
 				const tickboxElement = document.getElementById(`notify-${notify.timeslot}`);
 				tickboxElement.setAttribute('checked', true);
 			});

@@ -83,15 +83,16 @@ function getCookies() {
 
 const cookies = getCookies();
 
-if ('id' in cookies) { //user is logged in
-	userid = cookies.id;
-	document.getElementById('id').value = cookies.id;
+if ('userid' in cookies) { //user is logged in
+	userid = cookies.userid;
+	document.getElementById('userid').value = cookies.userid;
 	document.getElementById('email').value = cookies.email;
 	document.getElementById('fullname').value = cookies.fullname;
 	document.getElementById('phone').value = cookies.phone;
-	//document.getElementById('role').value = cookies.role;
+	document.getElementById('user-role').value = cookies.role_name;
 	document.getElementById('format').value = cookies.format;
 } else {
+	console.log('user is not logged in');
 	window.location.href = 'logout.php';
 }
 

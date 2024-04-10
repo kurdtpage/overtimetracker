@@ -1,11 +1,15 @@
+h1, h2 {
+	margin: .75rem;
+}
+
+#user-role {
+	padding-left: .75rem;
+}
+
 .alert {
-	margin: 16px;
+	margin: 1rem;
 }
 
 .line-through {
 	text-decoration: line-through;
-}
-
-h2 {
-	margin: 8px;
 }

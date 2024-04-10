@@ -30,8 +30,8 @@ xmlhttp1.onreadystatechange = function() {
 						<td><input type="text" readonly="" class="form-control-plaintext" value="${role.id}"></td>
 						<td><input type="text" class="form-control" value="${role.role_name}"></td>
 						<td>
-							<button type="submit" class="btn btn-primary update-role">Update</button>
-							<button type="submit" class="btn btn-danger delete-role">Delete</button>
+							<button type="submit" class="btn btn-primary update-role" onclick="premium()">Update</button>
+							<button type="submit" class="btn btn-danger delete-role" onclick="premium()">Delete</button>
 						</td>
 					`;
 				}
@@ -81,18 +81,21 @@ xmlhttp1.onreadystatechange = function() {
 					</table>
 				`;
 				tab_content.appendChild(newElement);
+
+				//hide admin tab
+				document.getElementById('role-admin-tab').style.display = 'none';
 			}
 			roleindex++;
 		});
 		document.getElementById('role').value = '';
 
 		newElement = document.createElement('tr');
-		newElement.setAttribute('id', 'user-new-role');
+		newElement.setAttribute('id', 'role-new');
 		newElement.innerHTML = `
 			<td><input type="text" readonly="" class="form-control-plaintext" value="${roleindex}"></td>
 			<td><input type="text" class="form-control" placeholder="New role"></td>
 			<td>
-				<button type="submit" class="btn btn-success">Add</button>
+				<button type="submit" class="btn btn-success" onclick="premium()">Add</button>
 			</td>
 		`;
 		tbody_roles.appendChild(newElement);

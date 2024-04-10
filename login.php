@@ -1,15 +1,10 @@
 <?php
-// Initialize the session
-session_start();
 
 // Check if the user is already logged in, if yes then redirect him to welcome page
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+if (isset($_COOKIE['loggedin']) && $_COOKIE['loggedin'] == 1) {
 	header('location: index.html');
 	exit;
 }
-
-// Include config file
-require_once 'php/inc/connect.php';
 
 // Define variables and initialize with empty values
 $email = $password = '';
@@ -17,6 +12,9 @@ $email_err = $password_err = $login_err = '';
 
 // Processing form data when form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+	// Include config file
+	require_once 'php/inc/connect.php';
+
 	// Check if email is empty
 	if (empty(trim($_POST['email']))) {
 		$email_err = 'Please enter email.';
@@ -34,9 +32,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// Validate credentials
 	if (empty($email_err) && empty($password_err)) {
 		// Prepare a select statement
-		$sql = 'SELECT *
-			FROM user
-			WHERE email = :email';
+		$sql = 'SELECT
+			user.id,
+			user.email,
+			user.password,
+			user.fullname,
+			user.phone,
+			user.role,
+			user.format,
+			user.active,
+			role.role_name
+		FROM 
+			user Left Join
+			role On role.id = user.role
+		WHERE
+			email = :email and
+			user.active = 1';
 
 		if ($stmt = $pdo->prepare($sql)) {
 			// Bind variables to the prepared statement as parameters
@@ -50,37 +61,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				// Check if email exists, if yes then verify password
 				if ($stmt->rowCount() == 1) {
 					if ($row = $stmt->fetch()) {
-						$id = $row['id'];
+						$userid = $row['id'];
 						$email = $row['email'];
 						$hashed_password = $row['password'];
 						$fullname = $row['fullname'];
 						$phone = $row['phone'];
 						$role = $row['role'];
+						$role_name = $row['role_name'];
 						$format = $row['format'];
 
 						if (password_verify($password, $hashed_password)) {
-							// Password is correct, so start a new session
-							session_start();
-
-							// Store data in session variables
-							$_SESSION['loggedin'] = true;
-							$_SESSION['userid'] = $id;
-							$_SESSION['email'] = $email;
-							$_SESSION['fullname'] = $fullname;
-							$_SESSION['phone'] = $phone;
-							$_SESSION['role'] = $role;
-							$_SESSION['format'] = $format;
-
-							setcookie('loggedin', true, time() + (86400 * 30), '/');
-							setcookie('id', $id, time() + (86400 * 30), '/');
-							setcookie('email', $email, time() + (86400 * 30), '/');
-							setcookie('fullname', $fullname, time() + (86400 * 30), '/');
-							setcookie('phone', $phone, time() + (86400 * 30), '/');
-							setcookie('role', $role, time() + (86400 * 30), '/');
-							setcookie('format', $format, time() + (86400 * 30), '/');
+							// Store data in cookie variables
+							setcookie('loggedin', true, time() + (86400 * 30));
+							setcookie('userid', $userid, time() + (86400 * 30));
+							setcookie('email', $email, time() + (86400 * 30));
+							setcookie('fullname', $fullname, time() + (86400 * 30));
+							setcookie('phone', $phone, time() + (86400 * 30));
+							setcookie('role', $role, time() + (86400 * 30));
+							setcookie('role_name', $role_name, time() + (86400 * 30));
+							setcookie('format', $format, time() + (86400 * 30));
 
 							// Redirect user to welcome page
 							header('location: index.html');
+							exit;
 						} else {
 							// Password is not valid, display a generic error message
 							$login_err = 'Invalid email or password.'; //password_hash($password, PASSWORD_DEFAULT);
