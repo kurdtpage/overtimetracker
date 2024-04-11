@@ -34,7 +34,7 @@
 			<div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab"
 				tabindex="98">
 				<!-- Profile tab -->
-				<h2>My approved overtime</h2>
+				<h2 title="This list is limited to the next 30 days">My approved overtime</h2>
 				<table class="table table-striped">
 					<thead>
 						<tr>
@@ -129,6 +129,7 @@
 						</h2>
 						<div id="collapseApproved" class="accordion-collapse collapse" data-bs-parent="#accordion">
 							<div class="accordion-body">
+								<button type="button" class="btn btn-outline-success" onclick="getapproved();">Refresh</button>
 								<table class="table table-striped">
 									<thead>
 										<tr>
@@ -157,6 +158,7 @@
 						</h2>
 						<div id="collapsePending" class="accordion-collapse collapse" data-bs-parent="#accordion">
 							<div class="accordion-body">
+								<button type="button" class="btn btn-outline-success" onclick="getrequests()">Refresh</button>
 								<table class="table table-striped">
 									<thead>
 										<tr>
@@ -351,6 +353,6 @@
 		<script src="js/roles.js"></script>
 		<script src="js/data.js"></script>
 		<script src="js/alert.js"></script>
-		<script src="js/admin.js"></script>
+		<script src="js/admin.js">//Make sure this one is last</script>
 	</body>
 </html>

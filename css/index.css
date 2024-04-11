@@ -13,3 +13,7 @@ h1, h2 {
 .line-through {
 	text-decoration: line-through;
 }
+
+.btn {
+	margin-right: 1px;
+}

@@ -7,6 +7,21 @@ let userid = 1;
  * @returns Formatted string representation of the date
  */
 function formatDate(date, format) {
+	/*
+	JS: https://api.jqueryui.com/datepicker/
+	PHP: https://www.php.net/manual/en/datetime.format.php
+									JS	PHP
+	day of month (no leading zero)	d	j
+	day of month (two digit)		dd	d
+	day name short					D	D
+	day name long					DD	l
+	month of year (no leading zero)	m	n
+	month of year (two digit)		mm	m
+	month name short				M	M
+	month name long					MM	F
+	year (two digit)				y	y
+	year (four digit)				yy	Y
+	*/
 	const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 	const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -46,9 +61,13 @@ xmlhttp0.onreadystatechange = function() {
 		const overtime = JSON.parse(this.responseText); // Parse the response to an array
 		console.log(overtime);
 		const format = document.getElementById('format');
+		const tbody_myovertime = document.getElementById('tbody-myovertime');
+		if (overtime.length !== 0) {
+			//clear out 'No approved overtime yet'
+			tbody_myovertime.innerHTML = '';
+		}
 
 		overtime.forEach(function(timeslot) {
-			const tbody_myovertime = document.getElementById('tbody-myovertime');
 			const tr = document.createElement('tr');
 			const startdate = timeslot.start_time.split(' ')[0];
 			const starttime = timeslot.start_time.split(' ')[1].split(':').slice(0, 2).join(':'); //remove seconds
@@ -112,6 +131,11 @@ if (profile_save) {
 				console.log(this.responseText);
 				if (JSON.parse(this.responseText).ok) {
 					appendAlert('Your profile has been saved', 'success');
+					//update cookie values
+					document.cookie = "fullname=" + document.getElementById('fullname').value;
+					document.cookie = "email="    + document.getElementById('email').value;
+					document.cookie = "phone="    + document.getElementById('phone').value;
+					document.cookie = "format="   + document.getElementById('format').value;
 				} else {
 					appendAlert('Your profile has not been saved', 'danger');
 				}
@@ -119,7 +143,7 @@ if (profile_save) {
 		};
 
 		const formData = new FormData();
-		formData.append('id', document.getElementById('id').value);
+		formData.append('userid', document.getElementById('userid').value);
 		formData.append('fullname', document.getElementById('fullname').value);
 		formData.append('email', document.getElementById('email').value);
 		formData.append('phone', document.getElementById('phone').value);

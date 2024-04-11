@@ -20,7 +20,7 @@ $stmt = $pdo->query('
 	Where
 		timeslot.taken <> 0 And
 		timeslot.start_time >= CurDate() And
-		timeslot.start_time < Date_Add(CurDate(), Interval 30 Day)
+		timeslot.start_time <= Date_Add(CurDate(), Interval 30 Day)
 	Order by
 		timeslot.start_time,
 		role.id,

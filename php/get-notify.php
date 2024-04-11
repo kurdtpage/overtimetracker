@@ -17,7 +17,7 @@ $stmt = $pdo->prepare('
 		role = :role And
 		user = :user And
 		timeslot >= CurDate() And
-		timeslot < Date_Add(CurDate(), Interval 30 Day)
+		timeslot <= Date_Add(CurDate(), Interval 30 Day)
 	Order by timeslot
 ');
 

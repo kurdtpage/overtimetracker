@@ -28,13 +28,12 @@ function notify(notify_id) {
 	const id = tickbox.getAttribute('id');
 
 	if (id.substring(0, 6) == 'notify') {
-		
 		// Send a POST request to post-notify.php
 		const xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (JSON.parse(this.responseText).ok) {
-					appendAlert('Notification requested', 'success');
+					appendAlert('Notification requested', 'successs');
 				} else {
 					appendAlert(`There was a problem with your notification request. ${JSON.parse(this.responseText).error}`, 'danger');
 					console.error(this.responseText);
@@ -45,42 +44,12 @@ function notify(notify_id) {
 		const state = tickbox.checked;
 		const formData = new FormData();
 
-		// Append id and state to the FormData object
+		// Append data to the FormData object
 		formData.append('id', id);
-		console.log('id', id);
 		formData.append('state', state);
 
 		xmlhttp.open('POST', 'php/post-notify.php', true);
 		xmlhttp.send(formData);
-		/*
-		fetch('php/post-notify.php', {
-			method: 'POST',
-			body: formData
-		})
-		.then(response => {
-			if (!response.ok) {
-				let errormessage = `Network response was not ok: ${response}`;
-				appendAlert(errormessage, 'danger');
-				throw new Error(errormessage);
-			}
-			return response.text();
-		})
-		.then(data => {
-			let errormessage = data;
-			if (data == "ok") {
-				appendAlert(errormessage, 'success');
-			} else {
-				appendAlert(errormessage, 'danger');
-			}
-			
-			console.log(errormessage);
-		})
-		.catch(error => {
-			let errormessage = 'There was a problem with the fetch operation: ';
-			appendAlert(errormessage + error, 'danger');
-			console.error(errormessage, error);
-		});
-		*/
 	}
 }
 
@@ -96,7 +65,28 @@ function confirmModalClick(id) {
 //someone added in a new overtime request
 document.getElementById('confirmBtn').addEventListener('click', function() {
 	//update request table
-	console.log('TODO');
+
+	// Send a POST request to post-request.php
+	const xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			if (JSON.parse(this.responseText).ok) {
+				appendAlert('Notification requested', 'successs');
+			} else {
+				appendAlert(`There was a problem with your notification request. ${JSON.parse(this.responseText).error}`, 'danger');
+				console.error(this.responseText);
+			}
+		}
+	};
+
+	const formData = new FormData();
+
+	// Append data to the FormData object
+	formData.append('userid', cookies.userid);
+	formData.append('timeslot', document.getElementById('timeslotid').value);
+
+	xmlhttp.open('POST', 'php/post-request.php', true);
+	xmlhttp.send(formData);
 });
 
 //Add new overtime record
@@ -126,6 +116,7 @@ document.getElementById('add-overtime').addEventListener('click', function() {
 	formData.append('area', document.getElementById('area').value);
 	formData.append('starttime', document.getElementById('starttime').value);
 	formData.append('endtime', document.getElementById('endtime').value);
+	formData.append('format', cookies.format);
 	
 	xmlhttp.open('POST', 'php/post-timeslot.php', true);
 	xmlhttp.send(formData);
@@ -151,13 +142,13 @@ function getData (role) {
 		const newElement = document.createElement('tr');
 		newElement.innerHTML = `
 			<td>${formatDate(currentDate, format.value)}</td>
-			<td id="role${role}-${formatDate(currentDate, 'YYYY-MM-DD')}"></td>
+			<td id="role${role}-${formatDate(currentDate, 'yy-mm-dd')}"></td>
 			<td>
 				<input
 					type="checkbox"
 					class="form-check-input"
-					onclick="notify('notify-${role}-${formatDate(currentDate, 'YYYY-MM-DD')}')"
-					id="notify-${formatDate(currentDate, 'YYYY-MM-DD')}"
+					onclick="notify('notify-${role}-${formatDate(currentDate, 'yy-mm-dd')}')"
+					id="notify-${formatDate(currentDate, 'yy-mm-dd')}"
 				>
 			</td>
 		`;
@@ -177,7 +168,7 @@ function getData (role) {
 				console.log('timeslot:', timeslot);
 				const id = timeslot.id;
 				const area_name = timeslot.area_name;
-				const startdate = timeslot.start_time.split(' ')[0]; //yyyy-mm-dd
+				const startdate = timeslot.start_time.split(' ')[0]; //yy-mm-dd
 				const starttime = timeslot.start_time.split(' ')[1].split(':').slice(0, 2).join(':'); //remove seconds
 				const endtime = timeslot.end_time.split(" ")[1].split(':').slice(0, 2).join(':'); //remove seconds
 				const parentElement = document.getElementById(`role${role}-${startdate}`);
@@ -185,16 +176,24 @@ function getData (role) {
 				const newElement = document.createElement('button');
 				newElement.setAttribute('id', id);
 				newElement.setAttribute('type', 'button');
-				newElement.setAttribute('class', 'btn btn-primary');
 				newElement.setAttribute('data-bs-toggle', 'modal');
 				newElement.setAttribute('data-bs-target', '#confirmModal');
 				newElement.setAttribute('onclick', `confirmModalClick('${id}')`);
+
+				if (timeslot.taken == cookies.userid) {
+					newElement.setAttribute('class', 'btn btn-success');
+					newElement.setAttribute('disabled', true);
+					newElement.setAttribute('title', 'You have already applied for this overtime');
+				} else {
+					newElement.setAttribute('class', 'btn btn-primary');
+				}
+
 				newElement.innerHTML = `${area_name} ${starttime} - ${endtime} (${getHours(starttime, endtime)} hours)`;
 				parentElement.appendChild(newElement);
 			});
 		}
 	};
-	xmlhttp2.open('GET', `php/get-data.php?userid=${userid}&role=${role}`, true);
+	xmlhttp2.open('GET', `php/get-data.php?role=${role}`, true);
 	xmlhttp2.send();
 
 	//get data from db for "Notify me" tick boxes

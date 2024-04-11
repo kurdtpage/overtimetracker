@@ -19,18 +19,19 @@ function generatePassphrase($words = 4, $separator = ' ')
         $passphrase .= $wordList[$index] . $separator;
     }
 
-    $passphrase .= rand(1, 9);
+    $passphrase .= rand(2, 9);
 
     return $passphrase;
 }
 
-$response = [];
-$response['ok'] = false;
-$response['post'] = $_POST;
-$response['cookie'] = $_COOKIE;
-$response['error'] = '';
+$response = [
+	'ok' => false,
+	'post' => $_POST,
+	'cookie' => $_COOKIE,
+	'error' => ''
+];
 
-if (empty($_POST['id'])) {
+if (empty($_POST['userid'])) {
 	$response['error'] = 'Missing data';
 	echo json_encode($response);
 	exit;
@@ -38,7 +39,7 @@ if (empty($_POST['id'])) {
 
 require_once 'inc/connect.php';
 
-if ($_POST['id'] == 'insert') {
+if ($_POST['userid'] == 'insert') {
 	//create new user
 	$password = generatePassphrase();
 	$sql = 'INSERT INTO user (
@@ -66,7 +67,7 @@ if ($_POST['id'] == 'insert') {
 	WHERE id = :id';
 	$data = [
 		'role' => $_POST['role'],
-		'id' => $_POST['id']
+		'id' => $_POST['userid']
 	];
 	$response['sql'][] = replaceNamedPlaceholders($sql, $data);
 	$stmt = $pdo->prepare($sql);
@@ -77,7 +78,7 @@ if ($_POST['id'] == 'insert') {
 		active = 0
 	WHERE id = :id';
 	$data = [
-		'id' => $_POST['id']
+		'id' => $_POST['userid']
 	];
 	$response['sql'][] = replaceNamedPlaceholders($sql, $data);
 	$stmt = $pdo->prepare($sql);
@@ -95,7 +96,7 @@ if ($_POST['id'] == 'insert') {
 		'email' => $_POST['email'],
 		'phone' => $_POST['phone'],
 		'format' => $_POST['format'],
-		'id' => $_POST['id']
+		'id' => $_POST['userid']
 	];
 	$response['sql'][] = replaceNamedPlaceholders($sql, $data);
 	$stmt = $pdo->prepare($sql);

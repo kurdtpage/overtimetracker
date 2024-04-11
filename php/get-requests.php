@@ -21,10 +21,11 @@ $stmt = $pdo->query('
 		area On area.id = timeslot.area
 	Where
 		timeslot.start_time >= CurDate() And
-		timeslot.start_time < Date_Add(CurDate(), Interval 30 Day) And
+		timeslot.start_time <= Date_Add(CurDate(), Interval 30 Day) And
 		timeslot.taken = 0
 	Order By
-		timeslot.start_time
+		timeslot.start_time,
+		rand()
 ');
 
 while ($timeslot = $stmt->fetch()) {

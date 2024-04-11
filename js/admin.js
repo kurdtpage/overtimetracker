@@ -1,11 +1,94 @@
-if (cookies.role == 0) {
-	//update "Approved overtime" table
+/**
+ * Adds a new user. This is from the Admin tab, under "Manage users", then Add
+ */
+function adduser() {
+	if (document.getElementById('user-new-name').value == '') {
+		appendAlert('User not added. Please type in a name for the new user', 'warning');
+		return;
+	}
+	if (document.getElementById('user-new-email').value == '') {
+		appendAlert('User not added. Please type in an email address for the new user', 'warning');
+		return;
+	}
+	if (document.querySelector('#user-new-role select').value == '') {
+		appendAlert('User not added. Please select a role for the new user', 'warning');
+		return;
+	}
+
+	const xmlhttp7 = new XMLHttpRequest();
+	xmlhttp7.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			console.log(this.responseText);
+			if (JSON.parse(this.responseText).ok) {
+				if (JSON.parse(this.responseText).password_emailed) {
+					appendAlert('The user has been created. Their password was emailed to them', 'success');
+				} else {
+					appendAlert(`The user has been created. Password is: "${JSON.parse(this.responseText).password}", please let them know`, 'warning');
+				}
+
+				//add the new user into the user table (tbody-users)
+				// Get values from input fields
+				const newId = document.getElementById('user-new-id').value;
+				const newName = document.getElementById('user-new-name').value;
+				const newEmail = document.getElementById('user-new-email').value;
+				const selectElement = document.getElementById('user-new-role');
+				const newRole = selectElement.options[selectElement.selectedIndex].text;
+			
+				// Create a new table row
+				const newRow = document.createElement('tr');
+				newRow.id = `user-${newId}`; // Assign an id to the new row for future reference
+			
+				// Populate the new row with cells containing input elements
+				newRow.innerHTML = `<td><input type="text" readonly="" class="form-control-plaintext" value="3"></td>
+					<td><input type="text"  readonly="" class="form-control-plaintext" value="${newName}"></td>
+					<td><input type="email" readonly="" class="form-control-plaintext" value="${newEmail}"></td>
+					<td><input type="text"  readonly="" class="form-control-plaintext" value="${newRole}"></td>
+					<td>
+						<button type="submit" class="btn btn-primary update-user">Update</button>
+						<button type="submit" class="btn btn-danger delete-user">Delete</button>
+					</td>`;
+			
+				// Insert the new row before the last row (assuming the last row is the "Add" row)
+				const addRow = document.getElementById('user-new').parentNode.parentNode;
+				addRow.parentNode.insertBefore(newRow, addRow);
+
+				//reset the "user-new" add form
+				document.getElementById('user-new-id').value = parseInt(newId) + 1;
+				document.getElementById('user-new-name').value = '';
+				document.getElementById('user-new-email').value = '';
+				document.querySelector('#user-new-role select').value == '';
+			} else {
+				appendAlert(`The user has not been created. ${JSON.parse(this.responseText).error}`, 'danger');
+			}
+		}
+	};
+
+	const formData = new FormData();
+	formData.append('userid', 'insert');
+	formData.append('fullname', document.getElementById('user-new-name').value);
+	formData.append('email', document.getElementById('user-new-email').value);
+	formData.append('role', document.querySelector('#user-new-role select').value);
+
+	xmlhttp7.open('POST', 'php/post-profile.php', true);
+	xmlhttp7.send(formData);
+}
+
+/**
+ * Updates "Approved overtime" table
+ */
+function getapproved () {
 	const xmlhttp3 = new XMLHttpRequest();
 	xmlhttp3.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			const requests = JSON.parse(this.responseText); // Parse the response to an array
 			console.log(requests);
+			const tbody_approved = document.getElementById('tbody-approved');
 			
+			if (requests.length != 0) {
+				//clear out 'All overtime requests have been approved'
+				tbody_approved.innerHTML = '';
+			}
+
 			requests.forEach(function(request) {
 				/*
 					timeslot.id,
@@ -15,7 +98,7 @@ if (cookies.role == 0) {
 					timeslot.end_time,
 					user.fullname
 				*/
-				const tbody_approved = document.getElementById('tbody-approved');
+				
 				let newElement = document.createElement('tr');
 				newElement.setAttribute('id', `approved-${request.id}`);
 
@@ -39,16 +122,22 @@ if (cookies.role == 0) {
 	};
 	xmlhttp3.open('GET', 'php/get-approved.php', true);
 	xmlhttp3.send();
+}
 
-	document.getElementById('area').value = '';
-
-	//update "Pending overtime Requests" table
+/**
+ * Updates "Pending overtime Requests" table
+ */
+function getrequests() {
 	const xmlhttp4 = new XMLHttpRequest();
 	xmlhttp4.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			const requests = JSON.parse(this.responseText); // Parse the response to an array
 			console.log(requests);
-			
+			const tbody_requests = document.getElementById('tbody-requests');
+			if (requests.length != 0) {
+				//clear out whatevers already in there
+				tbody_requests.innerHTML = '';
+			}
 			requests.forEach(function(request) {
 				/*
 					timeslot.id,
@@ -58,7 +147,7 @@ if (cookies.role == 0) {
 					timeslot.end_time,
 					user.fullname
 				*/
-				const tbody_requests = document.getElementById('tbody-requests');
+				
 				let newElement = document.createElement('tr');
 				newElement.setAttribute('id', `request-${request.id}`);
 
@@ -74,8 +163,7 @@ if (cookies.role == 0) {
 					<td>${formatDate(enddate, format.value)}<br>${endtime}</td>
 					<td>${request.fullname}</td>
 					<td>
-						<button type="button" class="btn btn-primary">Approve</button>
-						<button type="button" class="btn btn-danger">Decline</button>
+						<button type="button" class="btn btn-primary" onclick="approve('${request.id}')">Approve</button>
 					</td>
 				`;		
 
@@ -85,8 +173,12 @@ if (cookies.role == 0) {
 	};
 	xmlhttp4.open('GET', 'php/get-requests.php', true);
 	xmlhttp4.send();
+}
 
-	//update "Manage users" table
+/**
+ * Updates "Manage users" table
+ */
+function getusers() {
 	const xmlhttp5 = new XMLHttpRequest();
 	xmlhttp5.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -147,7 +239,7 @@ if (cookies.role == 0) {
 					const row = button.closest('tr');
 
 					// Get the ID and Role from the row
-					const id = row.querySelector('td:nth-child(1) input').value;
+					const userid = row.querySelector('td:nth-child(1) input').value;
 					const role = row.querySelector('.user-role select').value;
 					const xmlhttp = new XMLHttpRequest();
 					xmlhttp.onreadystatechange = function() {
@@ -162,7 +254,7 @@ if (cookies.role == 0) {
 					};
 
 					const formData = new FormData();
-					formData.append('id', id);
+					formData.append('userid', userid);
 					formData.append('role', role);
 					
 					xmlhttp.open('POST', 'php/post-profile.php', true);
@@ -177,7 +269,7 @@ if (cookies.role == 0) {
 				button.addEventListener('click', function() {
 					// Get the parent row of the clicked button
 					const row = button.closest('tr');
-					const id = row.querySelector('td:nth-child(1) input').value;
+					const userid = row.querySelector('td:nth-child(1) input').value;
 					const xmlhttp = new XMLHttpRequest();
 					xmlhttp.onreadystatechange = function() {
 						if (this.readyState == 4 && this.status == 200) {
@@ -192,7 +284,7 @@ if (cookies.role == 0) {
 					};
 
 					const formData = new FormData();
-					formData.append('id', id);
+					formData.append('userid', userid);
 					formData.append('action', 'delete');
 					
 					xmlhttp.open('POST', 'php/post-profile.php', true);
@@ -249,8 +341,12 @@ if (cookies.role == 0) {
 	};
 	xmlhttp5.open('GET', 'php/get-users.php', true);
 	xmlhttp5.send();
+}
 
-	//update Areas table
+/**
+ * Updates Areas table
+ */
+function getareas() {
 	const xmlhttp6 = new XMLHttpRequest();
 	xmlhttp6.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -300,81 +396,41 @@ if (cookies.role == 0) {
 	};
 	xmlhttp6.open('GET', 'php/get-areas.php', true);
 	xmlhttp6.send();
+}
 
-	/**
-	 * Adds a new user. This is from the Admin tab, under "Manage users", then Add
-	 */
-	function adduser() {
-		if (document.getElementById('user-new-name').value == '') {
-			appendAlert('User not added. Please type in a name for the new user', 'warning');
-			return;
-		}
-		if (document.getElementById('user-new-email').value == '') {
-			appendAlert('User not added. Please type in an email address for the new user', 'warning');
-			return;
-		}
-		if (document.querySelector('#user-new-role select').value == '') {
-			appendAlert('User not added. Please select a role for the new user', 'warning');
-			return;
-		}
+if (cookies.role == 0) { //if admin...
+	getapproved();
+	getrequests();
+	document.getElementById('area').value = ''; //sets the dropdown to nothing, just looks nice
+	getusers();
+	//roles is done in roles.js
+	getareas();
+}
 
-		const xmlhttp7 = new XMLHttpRequest();
-		xmlhttp7.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				console.log(this.responseText);
-				if (JSON.parse(this.responseText).ok) {
-					if (JSON.parse(this.responseText).password_emailed) {
-						appendAlert('The user has been created. Their password was emailed to them', 'success');
-					} else {
-						appendAlert(`The user has been created. Password is: "${JSON.parse(this.responseText).password}", please let them know`, 'warning');
-					}
+/**
+ * When admin clicks on Approve button in Pending overtime requests (tbody-requests)
+ */
+function approve(requestid) {
+	//update requests table
 
-					//add the new user into the user table (tbody-users)
-					// Get values from input fields
-					const newId = document.getElementById('user-new-id').value;
-					const newName = document.getElementById('user-new-name').value;
-					const newEmail = document.getElementById('user-new-email').value;
-					const selectElement = document.getElementById('user-new-role');
-					const newRole = selectElement.options[selectElement.selectedIndex].text;
-				
-					// Create a new table row
-					const newRow = document.createElement('tr');
-					newRow.id = `user-${newId}`; // Assign an id to the new row for future reference
-				
-					// Populate the new row with cells containing input elements
-					newRow.innerHTML = `<td><input type="text" readonly="" class="form-control-plaintext" value="3"></td>
-						<td><input type="text"  readonly="" class="form-control-plaintext" value="${newName}"></td>
-						<td><input type="email" readonly="" class="form-control-plaintext" value="${newEmail}"></td>
-						<td><input type="text"  readonly="" class="form-control-plaintext" value="${newRole}"></td>
-						<td>
-							<button type="submit" class="btn btn-primary update-user">Update</button>
-							<button type="submit" class="btn btn-danger delete-user">Delete</button>
-						</td>`;
-				
-					// Insert the new row before the last row (assuming the last row is the "Add" row)
-					const addRow = document.getElementById('user-new').parentNode.parentNode;
-					addRow.parentNode.insertBefore(newRow, addRow);
-
-					//reset the "user-new" add form
-					document.getElementById('user-new-id').value = parseInt(newId) + 1;
-					document.getElementById('user-new-name').value = '';
-					document.getElementById('user-new-email').value = '';
-					document.querySelector('#user-new-role select').value == '';
-				} else {
-					appendAlert(`The user has not been created. ${JSON.parse(this.responseText).error}`, 'danger');
-				}
+	const xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			if (JSON.parse(this.responseText).ok) {
+				appendAlert('Request approved', 'successs');
+				getrequests();
+			} else {
+				appendAlert(`There was a problem approving this request. ${JSON.parse(this.responseText).error}`, 'danger');
+				console.error(this.responseText);
 			}
-		};
+		}
+	};
 
-		const formData = new FormData();
-		formData.append('id', 'insert');
-		formData.append('fullname', document.getElementById('user-new-name').value);
-		formData.append('email', document.getElementById('user-new-email').value);
-		formData.append('role', document.querySelector('#user-new-role select').value);
+	const formData = new FormData();
+	formData.append('requestid', requestid);
 
-		xmlhttp7.open('POST', 'php/post-profile.php', true);
-		xmlhttp7.send(formData);
-	}
+	xmlhttp.open('POST', 'php/post-request.php', true);
+	xmlhttp.send(formData);
 }
 
 function premium () {

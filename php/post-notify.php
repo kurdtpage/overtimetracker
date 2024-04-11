@@ -1,10 +1,11 @@
 <?php
 
-$response = [];
-$response['ok'] = false;
-$response['post'] = $_POST;
-$response['cookie'] = $_COOKIE;
-$response['error'] = '';
+$response = [
+	'ok' => false,
+	'post' => $_POST,
+	'cookie' => $_COOKIE,
+	'error' => ''
+];
 
 if (empty($_POST['id']) || empty($_POST['state']) || !stristr($_POST['id'], '-')) {
 	echo 'Missing data';
@@ -50,8 +51,7 @@ if ($_COOKIE['role'] === '0') {
 		'user' => $user,
 		'role' => $role
 	];
-	$modifiedSql = replaceNamedPlaceholders($sql, $data);
-	$response['sql'][] = $modifiedSql;
+	$response['sql'][] = replaceNamedPlaceholders($sql, $data);
 
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute($data);
@@ -72,8 +72,7 @@ if ($_COOKIE['role'] === '0') {
 				'user' => $user,
 				'role' => $role
 			];
-			$modifiedSql = replaceNamedPlaceholders($sql, $data);
-			$response['sql'][] = $modifiedSql;
+			$response['sql'][] = replaceNamedPlaceholders($sql, $data);
 			$stmt = $pdo->prepare($sql);
 			$stmt->execute($data);
 		}
@@ -91,8 +90,7 @@ if ($_COOKIE['role'] === '0') {
 				'user' => $user,
 				'role' => $role
 			];
-			$modifiedSql = replaceNamedPlaceholders($sql, $data);
-			$output['sql'][] = $modifiedSql;
+			$output['sql'][] = replaceNamedPlaceholders($sql, $data);
 			$stmt = $pdo->prepare($sql);
 			$stmt->execute($data);
 		}

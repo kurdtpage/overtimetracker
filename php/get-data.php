@@ -3,13 +3,13 @@
 /*
 Inputs:
 $_GET array
-role - string (also contains spaces)
+role - int
 */
 
 $timeslots = array();
 
 if (empty($_GET['role'])) {
-	$timeslots[] = array(
+	$timeslots = array(
 		'error' => 'Missing info'
 	);
 	echo json_encode($timeslots);
@@ -30,17 +30,18 @@ $stmt = $pdo->prepare('
 		area On area.id = timeslot.area Left Join
 		role On role.id = timeslot.role
 	Where
-		timeslot.start_time > Now() And
-		timeslot.start_time < Date_Add(CurDate(), Interval 30 Day) And
+		timeslot.start_time >= CurDate() And
+		timeslot.start_time <= Date_Add(CurDate(), Interval 30 Day) And
 		role.id = :role And
-		timeslot.taken = 0
+		(timeslot.taken = 0 or timeslot.taken = :userid)
 	Order By
 		timeslot.start_time,
 		area.id
 ');
 
 $stmt->execute([
-	'role' => $_GET['role']
+	'role' => $_GET['role'],
+	'userid' => $_COOKIE['userid']
 ]);
 
 while ($timeslot = $stmt->fetch()) {
