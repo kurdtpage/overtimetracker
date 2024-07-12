@@ -39,7 +39,7 @@ if ($_COOKIE['role'] === '0') {
 	$user = $_COOKIE['userid'];
 
 	//get the timeslot id, this is to see if it exists or not
-	$sql = 'Select id
+	$sql = 'SELECT id
 		From notify
 		WHERE 
 			timeslot = :timeslot And

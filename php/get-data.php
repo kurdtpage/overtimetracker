@@ -18,25 +18,24 @@ if (empty($_GET['role'])) {
 
 require_once 'inc/connect.php';
 
-$stmt = $pdo->prepare('
-	Select
-		timeslot.id,
-		timeslot.start_time,
-		timeslot.end_time,
-		area.area_name,
-		timeslot.taken
-	From
-		timeslot Left Join
-		area On area.id = timeslot.area Left Join
-		role On role.id = timeslot.role
-	Where
-		timeslot.start_time >= CurDate() And
-		timeslot.start_time <= Date_Add(CurDate(), Interval 30 Day) And
-		role.id = :role And
-		(timeslot.taken = 0 or timeslot.taken = :userid)
-	Order By
-		timeslot.start_time,
-		area.id
+$stmt = $pdo->prepare('SELECT
+	timeslot.id,
+	timeslot.start_time,
+	timeslot.end_time,
+	area.area_name,
+	timeslot.taken
+From
+	timeslot Left Join
+	area On area.id = timeslot.area Left Join
+	role On role.id = timeslot.role
+Where
+	timeslot.start_time >= CurDate() And
+	timeslot.start_time <= Date_Add(CurDate(), Interval 30 Day) And
+	role.id = :role And
+	(timeslot.taken = 0 or timeslot.taken = :userid)
+Order By
+	timeslot.start_time,
+	area.id
 ');
 
 $stmt->execute([

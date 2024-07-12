@@ -23,6 +23,6 @@ const appendAlert = (message, type) => {
 const alertTrigger = document.getElementById('confirmBtn');
 if (alertTrigger) {
 	alertTrigger.addEventListener('click', () => {
-		appendAlert('Your leave booking has been requested', 'successs');
+		appendAlert('Your leave booking has been requested', 'success');
 	});
 }

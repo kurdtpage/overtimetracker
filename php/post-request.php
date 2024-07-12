@@ -19,7 +19,7 @@ if (isset($_POST['requestid'])) {
 	$sql = 'UPDATE request
 		SET approved_by = :userid
 		WHERE id = :requestid
-	)';
+	';
 	$data = [
 		'userid' => $_COOKIE['userid'],
 		'requestid' => $_POST['requestid']

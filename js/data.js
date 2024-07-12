@@ -33,7 +33,7 @@ function notify(notify_id) {
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (JSON.parse(this.responseText).ok) {
-					appendAlert('Notification requested', 'successs');
+					appendAlert('Notification requested', 'success');
 				} else {
 					appendAlert(`There was a problem with your notification request. ${JSON.parse(this.responseText).error}`, 'danger');
 					console.error(this.responseText);
@@ -71,7 +71,7 @@ document.getElementById('confirmBtn').addEventListener('click', function() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			if (JSON.parse(this.responseText).ok) {
-				appendAlert('Notification requested', 'successs');
+				appendAlert('Notification requested', 'success');
 			} else {
 				appendAlert(`There was a problem with your notification request. ${JSON.parse(this.responseText).error}`, 'danger');
 				console.error(this.responseText);

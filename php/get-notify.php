@@ -10,15 +10,16 @@ if (empty($_GET['userid']) || empty($_GET['role'])) {
 
 require_once 'inc/connect.php';
 
-$stmt = $pdo->prepare('
-	Select timeslot
-	From notify
-	Where
-		role = :role And
-		user = :user And
-		timeslot >= CurDate() And
-		timeslot <= Date_Add(CurDate(), Interval 30 Day)
-	Order by timeslot
+$stmt = $pdo->prepare('SELECT timeslot
+From
+	notify
+Where
+	role = :role And
+	user = :user And
+	timeslot >= CurDate() And
+	timeslot <= Date_Add(CurDate(), Interval 30 Day)
+Order by
+	timeslot
 ');
 
 $stmt->execute([

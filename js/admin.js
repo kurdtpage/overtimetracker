@@ -417,7 +417,7 @@ function approve(requestid) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			if (JSON.parse(this.responseText).ok) {
-				appendAlert('Request approved', 'successs');
+				appendAlert('Request approved', 'success');
 				getrequests();
 			} else {
 				appendAlert(`There was a problem approving this request. ${JSON.parse(this.responseText).error}`, 'danger');
