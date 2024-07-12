@@ -13,29 +13,4 @@ just change user.role to 0 in the database.
 
 
 ## SQL
-                                                     ╔═════════════════╗
-                                                     ║ area            ║
-                             ╔═══════════════════╗   ╟─────────────────╢
-                             ║ timeslot          ║ ┌►╢id(PK)        int║
-                             ╟───────────────────╢ │ ║area_name varchar║
-                           ┌►╢id(PK)          int║ │ ║active     int(1)║
-                           │ ║area(FK)        int╟─┘ ╚═════════════════╝
-╔════════════════════════╗ │ ║role(FK)        int╟─┐ ╔═════════════════╗   ╔════════════════════════╗
-║ request                ║ │ ║taken(FK)       int╟┐│ ║ role            ║   ║ notify                 ║
-╟────────────────────────╢ │ ║start_time datetime║││ ╟─────────────────╢   ╟────────────────────────╢
-║id(PK)               int║ │ ║end_time   datetime║│└►╢id(PK)        int╟◄┐ ║id(PK)               int║
-║timeslot(FK)         int╟─┘ ╚═══════════════════╝│  ║role_name varchar║ └─╢role(FK)             int║
-║user(FK)             int╟────────────────────────┤  ║active     int(1)║ ┌─╢user(FK)             int║
-║approved_by(FK)      int╟────────────────────────┤  ╚═════════════════╝ │ ║timeslot            date║
-╚════════════════════════╝                        │  ╔═════════════════╗ │ ║requested_time timestamp║
-                                                  │  ║ user            ║ │ ╚════════════════════════╝
-                                                  │  ╟─────────────────╢ │
-                                                  └─►╢id(PK)        int╟◄┘
-                                                     ║role(FK)      int║
-                                                     ║email     varchar║
-                                                     ║password  varchar║
-                                                     ║fullname  varchar║
-                                                     ║phone     varchar║
-                                                     ║format    varchar║
-                                                     ║active     int(1)║
-                                                     ╚═════════════════╝
+![alt text](https://github.com/kurdtpage/overtimetracker/blob/main/UML.png?raw=true)
